@@ -1,56 +1,54 @@
-# Welcome to your Expo app 👋
+💊 LembraFácil — Frontend
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+O LembraFácil é um aplicativo desenvolvido para auxiliar no controle da rotina de medicamentos, facilitando o acompanhamento dos horários e das doses.
 
-## Get started
+📱 Funcionalidades
 
-1. Install dependencies
+- Cadastro de medicamentos
+- Visualização dos medicamentos cadastrados
+- Leitura de receitas através de OCR
+- Extração de informações da receita
+- Edição e confirmação das informações antes de salvar
+- Login do usuário
+- Controle dos horários dos medicamentos
+- Acompanhamento da rotina de medicação
+- Identificação de doses em atraso
+- Área destinada ao familiar/cuidador
 
-   ```bash
-   npm install
-   ```
+📷 Leitura de Receita com OCR
 
-2. Start the app
+O aplicativo permite fotografar ou selecionar uma imagem de uma receita médica.
 
-   ```bash
-   npx expo start
-   ```
+A tecnologia OCR transforma o conteúdo da imagem em texto para auxiliar na identificação de informações como:
 
-In the output, you'll find options to open the app in a
+- Nome do medicamento
+- Dosagem
+- Quantidade
+- Horário
+- Frequência
+- Duração do tratamento
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+As informações podem ser conferidas e corrigidas pelo usuário antes de serem salvas.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+🛠️ Tecnologias utilizadas
 
-## Get a fresh project
+- React Native
+- Expo
+- Expo Router
+- TypeScript
+- AsyncStorage
+- Expo Camera
+- Expo Image Picker
+- API REST
 
-When you're ready, run:
+🔗 Backend
 
-```bash
-npm run reset-project
-```
+O aplicativo se comunica com uma API desenvolvida em Django REST Framework para realizar autenticação e gerenciamento dos medicamentos.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+🎯 Objetivo
 
-### Other setup steps
+O objetivo do LembraFácil é tornar o controle de medicamentos mais simples e organizado, especialmente para idosos, familiares e cuidadores.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+🚧 Status
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Projeto em desenvolvimento.
