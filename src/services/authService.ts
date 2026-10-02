@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // IP do computador onde o VIVERBACK está rodando
-export const API_URL = "http://172.16.1.11:8000/api";
+export const API_URL = "http://192.168.18.116:8000/api";
 
 const ACCESS_TOKEN_KEY = "@lembrafacil:access_token";
 const REFRESH_TOKEN_KEY = "@lembrafacil:refresh_token";
@@ -13,7 +13,7 @@ type LoginResponse = {
 
 // ======================================================
 // LOGIN
-// ======================================================
+//======================================================
 
 export async function fazerLogin(
   username: string,
@@ -26,13 +26,12 @@ export async function fazerLogin(
       "Content-Type": "application/json",
     },
 
-    body: JSON.stringify({
-      username,
-      password,
-    }),
+    body: JSON.stringify({ username, password }),
   });
 
   if (!response.ok) {
+    const corpo = await response.text();
+    console.log("Login falhou:", response.status, corpo);
     throw new Error("Usuário ou senha inválidos.");
   }
 
@@ -44,6 +43,41 @@ export async function fazerLogin(
   ]);
 
   return dados;
+}
+
+// ======================================================
+// CADASTRO + LOGIN AUTOMÁTICO
+// ======================================================
+
+export async function cadastrarEFazerLogin(
+  username: string,
+  nome: string,
+  password: string
+): Promise<LoginResponse> {
+  const response = await fetch(`${API_URL}/usuarios/cadastro/ `, {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({ username, nome, password }),
+  });
+
+  if (!response.ok) {
+    const erro = await response.json().catch(() => null);
+    console.log("Cadastro falhou:", response.status, erro);
+
+    // O DRF devolve algo como {"username": ["..."], "password": ["..."]}
+    const mensagem = erro
+      ? Object.values(erro).flat().join("\n")
+      : "Erro ao cadastrar.";
+
+    throw new Error(mensagem);
+  }
+
+  // Cadastro ok: entra automaticamente com os mesmos dados
+  return fazerLogin(username, password);
 }
 
 // ======================================================

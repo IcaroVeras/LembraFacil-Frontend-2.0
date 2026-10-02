@@ -16,6 +16,8 @@ import {
   View,
 } from "react-native";
 
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+
 import { adicionarMedicamento } from "../services/medicamentosService";
 
 type DadosReceita = {
@@ -38,6 +40,7 @@ const dadosVazios: DadosReceita = {
 
 export default function ReceitaScreen() {
   const router = useRouter();
+
   const cameraRef = useRef<CameraView>(null);
 
   const [cameraAberta, setCameraAberta] = useState(false);
@@ -45,6 +48,7 @@ export default function ReceitaScreen() {
   const [tirandoFoto, setTirandoFoto] = useState(false);
   const [lendoReceita, setLendoReceita] = useState(false);
   const [textoOCR, setTextoOCR] = useState("");
+
   const [dadosReceita, setDadosReceita] =
     useState<DadosReceita | null>(null);
 
@@ -65,6 +69,7 @@ export default function ReceitaScreen() {
             "Permissão necessária",
             "Precisamos acessar a câmera para fotografar a receita."
           );
+
           return;
         }
       }
@@ -119,7 +124,7 @@ export default function ReceitaScreen() {
   }
 
   // =========================================================
-  // ESCOLHER FOTO
+  // ESCOLHER FOTO DA GALERIA
   // =========================================================
 
   async function escolherFoto() {
@@ -141,7 +146,10 @@ export default function ReceitaScreen() {
         setDadosReceita(null);
       }
     } catch (erro) {
-      console.log("Erro ao escolher foto:", erro);
+      console.log(
+        "Erro ao escolher foto:",
+        erro
+      );
 
       Alert.alert(
         "Erro",
@@ -171,6 +179,7 @@ export default function ReceitaScreen() {
   ): Promise<string> {
     try {
       const arquivo = new File(uri);
+
       const base64 = await arquivo.base64();
 
       if (!base64) {
@@ -200,7 +209,7 @@ export default function ReceitaScreen() {
   }
 
   // =========================================================
-  // EXTRAIR DADOS
+  // EXTRAIR DADOS DO TEXTO
   // =========================================================
 
   function extrairDadosSeguros(
@@ -230,15 +239,17 @@ export default function ReceitaScreen() {
     // ENCONTRAR ÁREA DA PRESCRIÇÃO
     // =======================================================
 
-    let indicePrescricao = linhas.findIndex((linha) =>
-      /PRESCRIÇÃO|PRESCRICAO/i.test(linha)
+    let indicePrescricao = linhas.findIndex(
+      (linha) =>
+        /PRESCRIÇÃO|PRESCRICAO/i.test(linha)
     );
 
     if (indicePrescricao === -1) {
-      indicePrescricao = linhas.findIndex((linha) =>
-        /USO\s+ORAL|USO\s+INTERNO|USO\s+EXTERNO/i.test(
-          linha
-        )
+      indicePrescricao = linhas.findIndex(
+        (linha) =>
+          /USO\s+ORAL|USO\s+INTERNO|USO\s+EXTERNO/i.test(
+            linha
+          )
       );
     }
 
@@ -249,13 +260,6 @@ export default function ReceitaScreen() {
 
     // =======================================================
     // MEDICAMENTO + DOSAGEM
-    //
-    // EXEMPLO REAL:
-    //
-    // 1. ATAKCLAV 875 +125MG
-    //
-    // medicamento = ATAKCLAV
-    // dosagem = 875 + 125MG
     // =======================================================
 
     for (
@@ -273,14 +277,6 @@ export default function ReceitaScreen() {
         break;
       }
 
-      // Primeiro remove a numeração:
-      //
-      // "1. ATAKCLAV 875 +125MG"
-      //
-      // vira:
-      //
-      // "ATAKCLAV 875 +125MG"
-
       const semNumero = linha
         .replace(
           /^\s*\d+\s*[.)º°:-]?\s*/,
@@ -288,12 +284,10 @@ export default function ReceitaScreen() {
         )
         .trim();
 
-      // Procura a PRIMEIRA sequência numérica que
-      // represente uma dosagem.
-
-      const matchDosagem = semNumero.match(
-        /\d+(?:[.,]\d+)?\s*(?:\+\s*\d+(?:[.,]\d+)?)?\s*(?:MG|MCG|G|ML|UI)\b/i
-      );
+      const matchDosagem =
+        semNumero.match(
+          /\d+(?:[.,]\d+)?\s*(?:\+\s*\d+(?:[.,]\d+)?)?\s*(?:MG|MCG|G|ML|UI)\b/i
+        );
 
       if (!matchDosagem) {
         continue;
@@ -311,8 +305,6 @@ export default function ReceitaScreen() {
         .trim()
         .replace(/[,:;-]+$/, "")
         .trim();
-
-      // Evitar campos administrativos
 
       const proibidas = [
         "CRM",
@@ -369,12 +361,7 @@ export default function ReceitaScreen() {
     }
 
     // =======================================================
-    // FALLBACK ESPECIAL
-    //
-    // Caso o OCR tenha separado:
-    //
-    // 1. ATAKCLAV
-    // 875 +125MG
+    // FALLBACK QUANDO NOME E DOSAGEM ESTÃO EM LINHAS SEPARADAS
     // =======================================================
 
     if (!resultado.medicamento) {
@@ -419,8 +406,6 @@ export default function ReceitaScreen() {
 
     // =======================================================
     // QUANTIDADE
-    //
-    // TOMAR 1 CP
     // =======================================================
 
     const quantidadeMatch =
@@ -435,9 +420,7 @@ export default function ReceitaScreen() {
     }
 
     // =======================================================
-    // FREQUÊNCIA
-    //
-    // 12/12 HORAS
+    // FREQUÊNCIA - 12/12 HORAS
     // =======================================================
 
     const frequenciaMatch =
@@ -451,7 +434,7 @@ export default function ReceitaScreen() {
     }
 
     // =======================================================
-    // A CADA X HORAS
+    // FREQUÊNCIA - A CADA X HORAS
     // =======================================================
 
     if (!resultado.frequencia) {
@@ -467,7 +450,7 @@ export default function ReceitaScreen() {
     }
 
     // =======================================================
-    // X VEZES AO DIA
+    // FREQUÊNCIA - X VEZES AO DIA
     // =======================================================
 
     if (!resultado.frequencia) {
@@ -484,8 +467,6 @@ export default function ReceitaScreen() {
 
     // =======================================================
     // DURAÇÃO
-    //
-    // POR 7 DIAS
     // =======================================================
 
     const duracaoMatch =
@@ -501,8 +482,6 @@ export default function ReceitaScreen() {
 
     // =======================================================
     // HORÁRIO
-    //
-    // Só coloca se realmente existir na receita.
     // =======================================================
 
     const horarios =
@@ -516,9 +495,7 @@ export default function ReceitaScreen() {
       ].join(", ");
     }
 
-    console.log(
-      "============================"
-    );
+    console.log("============================");
     console.log("RESULTADO FINAL");
     console.log(
       "Medicamento:",
@@ -544,9 +521,7 @@ export default function ReceitaScreen() {
       "Duração:",
       resultado.duracao
     );
-    console.log(
-      "============================"
-    );
+    console.log("============================");
 
     return resultado;
   }
@@ -635,12 +610,14 @@ export default function ReceitaScreen() {
           "Não foi possível ler",
           "O OCR não encontrou texto suficiente."
         );
+
         return;
       }
 
       console.log(
         "========= TEXTO OCR ========="
       );
+
       console.log(textoReconhecido);
 
       setTextoOCR(
@@ -694,7 +671,7 @@ export default function ReceitaScreen() {
   }
 
   // =========================================================
-  // SALVAR
+  // SALVAR MEDICAMENTO
   // =========================================================
 
   async function salvarMedicamento() {
@@ -709,6 +686,7 @@ export default function ReceitaScreen() {
         "Atenção",
         "Informe o medicamento."
       );
+
       return;
     }
 
@@ -719,6 +697,7 @@ export default function ReceitaScreen() {
         "Atenção",
         "Informe a dosagem."
       );
+
       return;
     }
 
@@ -732,6 +711,7 @@ export default function ReceitaScreen() {
           "a frequência"
         }, mas precisamos saber a hora da primeira dose. Digite, por exemplo, 08:00.`
       );
+
       return;
     }
 
@@ -791,11 +771,7 @@ export default function ReceitaScreen() {
 
   if (cameraAberta) {
     return (
-      <View
-        style={
-          styles.cameraContainer
-        }
-      >
+      <View style={styles.cameraContainer}>
         <CameraView
           ref={cameraRef}
           style={styles.camera}
@@ -808,20 +784,18 @@ export default function ReceitaScreen() {
             setCameraAberta(false)
           }
         >
-          <Text
-            style={
-              styles.cancelarText
-            }
-          >
+          <Ionicons
+            name="close"
+            size={23}
+            color="#FFFFFF"
+          />
+
+          <Text style={styles.cancelarText}>
             Cancelar
           </Text>
         </TouchableOpacity>
 
-        <View
-          style={
-            styles.cameraButtons
-          }
-        >
+        <View style={styles.cameraButtons}>
           <TouchableOpacity
             style={styles.capture}
             onPress={tirarFoto}
@@ -867,34 +841,42 @@ export default function ReceitaScreen() {
           false
         }
       >
-        <TouchableOpacity
-          onPress={() =>
-            router.back()
-          }
-        >
-          <Text
-            style={styles.voltar}
+        {/* CABEÇALHO */}
+
+        <View style={styles.topBar}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+            activeOpacity={0.8}
           >
-            ← Voltar
+            <Ionicons
+              name="chevron-back"
+              size={26}
+              color="#2563EB"
+            />
+          </TouchableOpacity>
+
+          <View style={styles.headerIcon}>
+            <Ionicons
+              name="camera"
+              size={25}
+              color="#2563EB"
+            />
+          </View>
+        </View>
+
+        <View style={styles.header}>
+          <Text style={styles.title}>
+            Ler receita
           </Text>
-        </TouchableOpacity>
 
-        <Text
-          style={styles.title}
-        >
-          📷 Ler receita
-        </Text>
+          <Text style={styles.subtitle}>
+            Fotografe sua receita e confira
+            as informações antes de cadastrar.
+          </Text>
+        </View>
 
-        <Text
-          style={styles.subtitle}
-        >
-          Fotografe sua receita para
-          identificar somente as
-          informações que estiverem
-          escritas.
-        </Text>
-
-        {/* FOTO */}
+        {/* FOTO / ÁREA DE CAPTURA */}
 
         {foto ? (
           <View
@@ -902,19 +884,85 @@ export default function ReceitaScreen() {
               styles.previewContainer
             }
           >
+            <View style={styles.previewHeader}>
+              <View
+                style={
+                  styles.previewHeaderIcon
+                }
+              >
+                <Ionicons
+                  name="document-text"
+                  size={22}
+                  color="#2563EB"
+                />
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={
+                    styles.previewTitle
+                  }
+                >
+                  Receita selecionada
+                </Text>
+
+                <Text
+                  style={
+                    styles.previewSubtitle
+                  }
+                >
+                  Confira a imagem antes
+                  da leitura
+                </Text>
+              </View>
+            </View>
+
             <Image
               source={{ uri: foto }}
               style={styles.preview}
               resizeMode="contain"
             />
 
-            <Text
+            <TouchableOpacity
               style={
-                styles.previewText
+                styles.continuarButton
               }
+              onPress={lerReceita}
+              disabled={lendoReceita}
+              activeOpacity={0.85}
             >
-              Foto da receita
-            </Text>
+              {lendoReceita ? (
+                <>
+                  <ActivityIndicator
+                    color="#FFFFFF"
+                  />
+
+                  <Text
+                    style={
+                      styles.continuarText
+                    }
+                  >
+                    LENDO RECEITA...
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Ionicons
+                    name="scan"
+                    size={23}
+                    color="#FFFFFF"
+                  />
+
+                  <Text
+                    style={
+                      styles.continuarText
+                    }
+                  >
+                    LER RECEITA
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
 
             <TouchableOpacity
               style={
@@ -924,64 +972,36 @@ export default function ReceitaScreen() {
                 tirarOutraFoto
               }
             >
+              <Ionicons
+                name="camera-outline"
+                size={21}
+                color="#2563EB"
+              />
+
               <Text
                 style={
                   styles.novaFotoText
                 }
               >
-                📷 Tirar outra foto
+                Tirar outra foto
               </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={
-                styles.continuarButton
-              }
-              onPress={
-                lerReceita
-              }
-              disabled={
-                lendoReceita
-              }
-            >
-              {lendoReceita ? (
-                <>
-                  <ActivityIndicator
-                    color="#FFF"
-                  />
-
-                  <Text
-                    style={
-                      styles.continuarText
-                    }
-                  >
-                    LENDO...
-                  </Text>
-                </>
-              ) : (
-                <Text
-                  style={
-                    styles.continuarText
-                  }
-                >
-                  🔎 LER RECEITA
-                </Text>
-              )}
             </TouchableOpacity>
           </View>
         ) : (
           <View
-            style={
-              styles.cameraBox
-            }
+            style={styles.cameraBox}
           >
-            <Text
+            <View
               style={
-                styles.cameraIcon
+                styles.bigCameraIcon
               }
             >
-              📄
-            </Text>
+              <Ionicons
+                name="document-text-outline"
+                size={43}
+                color="#2563EB"
+              />
+            </View>
 
             <Text
               style={
@@ -996,11 +1016,82 @@ export default function ReceitaScreen() {
                 styles.cameraText
               }
             >
-              O aplicativo vai ler
-              somente aquilo que estiver
-              escrito na receita.
+              Posicione a receita em um
+              local bem iluminado para
+              facilitar a leitura.
             </Text>
+
+            <View
+              style={
+                styles.securityInfo
+              }
+            >
+              <Ionicons
+                name="shield-checkmark"
+                size={19}
+                color="#16A34A"
+              />
+
+              <Text
+                style={
+                  styles.securityText
+                }
+              >
+                Você confere os dados antes
+                de cadastrar
+              </Text>
+            </View>
           </View>
+        )}
+
+        {/* BOTÕES PARA ESCOLHER IMAGEM */}
+
+        {!foto && (
+          <>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={abrirCamera}
+              activeOpacity={0.85}
+            >
+              <Ionicons
+                name="camera"
+                size={24}
+                color="#FFFFFF"
+              />
+
+              <Text
+                style={
+                  styles.buttonText
+                }
+              >
+                ABRIR CÂMERA
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={
+                styles.galleryButton
+              }
+              onPress={
+                escolherFoto
+              }
+              activeOpacity={0.85}
+            >
+              <Ionicons
+                name="images-outline"
+                size={23}
+                color="#2563EB"
+              />
+
+              <Text
+                style={
+                  styles.galleryText
+                }
+              >
+                Escolher da galeria
+              </Text>
+            </TouchableOpacity>
+          </>
         )}
 
         {/* RESULTADO */}
@@ -1011,158 +1102,257 @@ export default function ReceitaScreen() {
               styles.resultadoContainer
             }
           >
-            <Text
+            <View
               style={
-                styles.resultadoTitulo
+                styles.resultadoHeader
               }
             >
-              📋 Informações da receita
-            </Text>
+              <View
+                style={
+                  styles.resultadoIcon
+                }
+              >
+                <Ionicons
+                  name="clipboard-outline"
+                  size={25}
+                  color="#2563EB"
+                />
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={
+                    styles.resultadoTitulo
+                  }
+                >
+                  Informações da receita
+                </Text>
+
+                <Text
+                  style={
+                    styles.resultadoSubtitulo
+                  }
+                >
+                  Revise antes de salvar
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.aviso}>
+              <Ionicons
+                name="alert-circle-outline"
+                size={21}
+                color="#92400E"
+              />
+
+              <Text
+                style={
+                  styles.avisoText
+                }
+              >
+                Confira os dados com a
+                receita original antes de
+                cadastrar.
+              </Text>
+            </View>
 
             <Text
-              style={styles.aviso}
+              style={styles.inputLabel}
             >
-              ⚠️ Confira os dados antes
-              de criar qualquer lembrete.
+              Medicamento *
             </Text>
 
-            <Text
+            <View
               style={
-                styles.inputLabel
+                styles.inputContainer
               }
             >
-              💊 Medicamento *
-            </Text>
+              <MaterialCommunityIcons
+                name="pill"
+                size={21}
+                color="#64748B"
+              />
 
-            <TextInput
-              style={styles.input}
-              placeholder="Ex.: Dipirona"
-              placeholderTextColor="#888"
-              value={
-                dadosReceita.medicamento
-              }
-              onChangeText={(valor) =>
-                atualizarCampo(
-                  "medicamento",
-                  valor
-                )
-              }
-            />
+              <TextInput
+                style={styles.input}
+                placeholder="Ex.: Dipirona"
+                placeholderTextColor="#94A3B8"
+                value={
+                  dadosReceita.medicamento
+                }
+                onChangeText={(valor) =>
+                  atualizarCampo(
+                    "medicamento",
+                    valor
+                  )
+                }
+              />
+            </View>
 
             <Text
-              style={
-                styles.inputLabel
-              }
+              style={styles.inputLabel}
             >
-              💊 Dosagem *
+              Dosagem *
             </Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Ex.: 500MG"
-              placeholderTextColor="#888"
-              value={
-                dadosReceita.dosagem
+            <View
+              style={
+                styles.inputContainer
               }
-              onChangeText={(valor) =>
-                atualizarCampo(
-                  "dosagem",
-                  valor
-                )
-              }
-            />
+            >
+              <Ionicons
+                name="flask-outline"
+                size={21}
+                color="#64748B"
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Ex.: 500MG"
+                placeholderTextColor="#94A3B8"
+                value={
+                  dadosReceita.dosagem
+                }
+                onChangeText={(valor) =>
+                  atualizarCampo(
+                    "dosagem",
+                    valor
+                  )
+                }
+              />
+            </View>
 
             <Text
-              style={
-                styles.inputLabel
-              }
+              style={styles.inputLabel}
             >
-              🔢 Quantidade
+              Quantidade
             </Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Ex.: 1 CP"
-              placeholderTextColor="#888"
-              value={
-                dadosReceita.quantidade
+            <View
+              style={
+                styles.inputContainer
               }
-              onChangeText={(valor) =>
-                atualizarCampo(
-                  "quantidade",
-                  valor
-                )
-              }
-            />
+            >
+              <Ionicons
+                name="layers-outline"
+                size={21}
+                color="#64748B"
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Ex.: 1 CP"
+                placeholderTextColor="#94A3B8"
+                value={
+                  dadosReceita.quantidade
+                }
+                onChangeText={(valor) =>
+                  atualizarCampo(
+                    "quantidade",
+                    valor
+                  )
+                }
+              />
+            </View>
 
             <Text
-              style={
-                styles.inputLabel
-              }
+              style={styles.inputLabel}
             >
-              ⏰ Horário da primeira dose *
+              Horário da primeira dose *
             </Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Ex.: 08:00"
-              placeholderTextColor="#888"
-              value={
-                dadosReceita.horario
+            <View
+              style={
+                styles.inputContainer
               }
-              onChangeText={(valor) =>
-                atualizarCampo(
-                  "horario",
-                  valor
-                )
-              }
-            />
+            >
+              <Ionicons
+                name="time-outline"
+                size={21}
+                color="#64748B"
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Ex.: 08:00"
+                placeholderTextColor="#94A3B8"
+                value={
+                  dadosReceita.horario
+                }
+                onChangeText={(valor) =>
+                  atualizarCampo(
+                    "horario",
+                    valor
+                  )
+                }
+              />
+            </View>
 
             <Text
-              style={
-                styles.inputLabel
-              }
+              style={styles.inputLabel}
             >
-              🔄 Frequência
+              Frequência
             </Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Ex.: 12/12 HORAS"
-              placeholderTextColor="#888"
-              value={
-                dadosReceita.frequencia
+            <View
+              style={
+                styles.inputContainer
               }
-              onChangeText={(valor) =>
-                atualizarCampo(
-                  "frequencia",
-                  valor
-                )
-              }
-            />
+            >
+              <Ionicons
+                name="repeat-outline"
+                size={21}
+                color="#64748B"
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Ex.: 12/12 HORAS"
+                placeholderTextColor="#94A3B8"
+                value={
+                  dadosReceita.frequencia
+                }
+                onChangeText={(valor) =>
+                  atualizarCampo(
+                    "frequencia",
+                    valor
+                  )
+                }
+              />
+            </View>
 
             <Text
-              style={
-                styles.inputLabel
-              }
+              style={styles.inputLabel}
             >
-              📅 Duração
+              Duração
             </Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Ex.: 7 DIAS"
-              placeholderTextColor="#888"
-              value={
-                dadosReceita.duracao
+            <View
+              style={
+                styles.inputContainer
               }
-              onChangeText={(valor) =>
-                atualizarCampo(
-                  "duracao",
-                  valor
-                )
-              }
-            />
+            >
+              <Ionicons
+                name="calendar-outline"
+                size={21}
+                color="#64748B"
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Ex.: 7 DIAS"
+                placeholderTextColor="#94A3B8"
+                value={
+                  dadosReceita.duracao
+                }
+                onChangeText={(valor) =>
+                  atualizarCampo(
+                    "duracao",
+                    valor
+                  )
+                }
+              />
+            </View>
 
             <TouchableOpacity
               style={
@@ -1171,13 +1361,20 @@ export default function ReceitaScreen() {
               onPress={
                 salvarMedicamento
               }
+              activeOpacity={0.85}
             >
+              <Ionicons
+                name="checkmark-circle"
+                size={24}
+                color="#FFFFFF"
+              />
+
               <Text
                 style={
                   styles.confirmarText
                 }
               >
-                ✅ CONFIRMAR E CADASTRAR
+                CONFIRMAR E CADASTRAR
               </Text>
             </TouchableOpacity>
           </View>
@@ -1191,24 +1388,34 @@ export default function ReceitaScreen() {
               styles.ocrContainer
             }
           >
-            <Text
+            <View
               style={
-                styles.ocrTitulo
+                styles.ocrHeader
               }
             >
-              🔎 Texto reconhecido
-            </Text>
+              <Ionicons
+                name="scan-outline"
+                size={23}
+                color="#2563EB"
+              />
+
+              <Text
+                style={
+                  styles.ocrTitulo
+                }
+              >
+                Texto reconhecido
+              </Text>
+            </View>
 
             <Text
               style={
                 styles.ocrAviso
               }
             >
-              O texto abaixo é o que o
-              OCR conseguiu ler da
-              imagem. Confira a receita
-              original antes de
-              cadastrar.
+              Este é o texto identificado
+              na fotografia. Compare com a
+              receita original.
             </Text>
 
             <View
@@ -1227,33 +1434,7 @@ export default function ReceitaScreen() {
           </View>
         ) : null}
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={abrirCamera}
-        >
-          <Text
-            style={styles.buttonText}
-          >
-            📷 ABRIR CÂMERA
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={
-            styles.galleryButton
-          }
-          onPress={
-            escolherFoto
-          }
-        >
-          <Text
-            style={
-              styles.galleryText
-            }
-          >
-            🖼️ Escolher uma foto
-          </Text>
-        </TouchableOpacity>
+        {/* MEDICAMENTOS */}
 
         <TouchableOpacity
           style={
@@ -1264,15 +1445,60 @@ export default function ReceitaScreen() {
               "/medicamentos"
             )
           }
+          activeOpacity={0.85}
         >
-          <Text
+          <View
             style={
-              styles.listaButtonText
+              styles.listaIcon
             }
           >
-            📋 ABRIR MEUS MEDICAMENTOS
-          </Text>
+            <MaterialCommunityIcons
+              name="pill"
+              size={24}
+              color="#2563EB"
+            />
+          </View>
+
+          <View style={{ flex: 1 }}>
+            <Text
+              style={
+                styles.listaButtonText
+              }
+            >
+              Meus medicamentos
+            </Text>
+
+            <Text
+              style={
+                styles.listaDescription
+              }
+            >
+              Veja os medicamentos já
+              cadastrados
+            </Text>
+          </View>
+
+          <Ionicons
+            name="chevron-forward"
+            size={23}
+            color="#2563EB"
+          />
         </TouchableOpacity>
+
+        <View style={styles.footer}>
+          <Ionicons
+            name="heart"
+            size={18}
+            color="#16A34A"
+          />
+
+          <Text
+            style={styles.footerText}
+          >
+            LembraFácil • Cuidando da sua
+            rotina
+          </Text>
+        </View>
       </ScrollView>
     </View>
   );
@@ -1285,92 +1511,190 @@ export default function ReceitaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F8FA",
+    backgroundColor: "#F8FBFF",
   },
 
   content: {
-    padding: 22,
-    paddingBottom: 50,
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 45,
   },
 
-  voltar: {
-    fontSize: 18,
-    color: "#2563EB",
-    fontWeight: "700",
-    marginBottom: 25,
+  // CABEÇALHO
+
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 22,
+  },
+
+  backButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+
+    elevation: 3,
+  },
+
+  headerIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: "#E4F1FF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  header: {
+    marginBottom: 23,
   },
 
   title: {
     fontSize: 32,
-    fontWeight: "800",
-    color: "#222",
+    fontWeight: "900",
+    color: "#0F2557",
+    letterSpacing: -0.5,
   },
 
   subtitle: {
-    fontSize: 18,
-    color: "#666",
-    marginTop: 8,
-    marginBottom: 25,
-    lineHeight: 27,
+    fontSize: 16,
+    color: "#64748B",
+    marginTop: 7,
+    lineHeight: 23,
+    fontWeight: "500",
   },
+
+  // CARD INICIAL
 
   cameraBox: {
-    backgroundColor: "#FFF",
-    borderRadius: 20,
-    padding: 30,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 26,
+    paddingHorizontal: 24,
+    paddingVertical: 31,
     alignItems: "center",
+
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+
     elevation: 3,
-    borderWidth: 2,
-    borderStyle: "dashed",
-    borderColor: "#2563EB",
   },
 
-  cameraIcon: {
-    fontSize: 60,
+  bigCameraIcon: {
+    width: 82,
+    height: 82,
+    borderRadius: 25,
+    backgroundColor: "#E4F1FF",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   cameraTitle: {
-    fontSize: 23,
-    fontWeight: "800",
-    marginTop: 15,
+    fontSize: 22,
+    fontWeight: "900",
+    color: "#0F2557",
+    marginTop: 18,
   },
 
   cameraText: {
     textAlign: "center",
-    fontSize: 16,
-    color: "#666",
-    lineHeight: 24,
-    marginTop: 10,
+    fontSize: 15,
+    color: "#64748B",
+    lineHeight: 22,
+    marginTop: 8,
   },
+
+  securityInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#EAF9F0",
+    paddingHorizontal: 13,
+    paddingVertical: 10,
+    borderRadius: 13,
+    marginTop: 18,
+  },
+
+  securityText: {
+    flex: 1,
+    color: "#166534",
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: "700",
+    marginLeft: 7,
+  },
+
+  // BOTÕES
 
   button: {
     backgroundColor: "#2563EB",
     borderRadius: 18,
-    padding: 20,
+    minHeight: 62,
     alignItems: "center",
-    marginTop: 25,
+    justifyContent: "center",
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 20,
+
+    shadowColor: "#2563EB",
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+
+    elevation: 4,
   },
 
   buttonText: {
-    color: "#FFF",
-    fontSize: 20,
+    color: "#FFFFFF",
+    fontSize: 17,
     fontWeight: "900",
   },
 
   galleryButton: {
-    padding: 18,
+    minHeight: 58,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    marginTop: 12,
     alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    gap: 9,
+    borderWidth: 1,
+    borderColor: "#DCE7F5",
   },
 
   galleryText: {
     color: "#2563EB",
-    fontSize: 17,
-    fontWeight: "700",
+    fontSize: 16,
+    fontWeight: "800",
   },
+
+  // CÂMERA
 
   cameraContainer: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#000000",
   },
 
   camera: {
@@ -1389,7 +1713,7 @@ const styles = StyleSheet.create({
     width: 82,
     height: 82,
     borderRadius: 41,
-    backgroundColor: "#FFF",
+    backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1403,188 +1727,334 @@ const styles = StyleSheet.create({
 
   cancelar: {
     position: "absolute",
-    left: 25,
+    left: 20,
     top: 50,
     zIndex: 10,
     backgroundColor:
       "rgba(0,0,0,0.65)",
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
 
   cancelarText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "700",
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "800",
   },
 
   cameraInstruction: {
-    color: "#FFF",
+    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "700",
     marginTop: 12,
   },
 
+  // FOTO
+
   previewContainer: {
-    backgroundColor: "#FFF",
-    borderRadius: 20,
-    padding: 10,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 26,
+    padding: 14,
+
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+
     elevation: 3,
+  },
+
+  previewHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 14,
+  },
+
+  previewHeaderIcon: {
+    width: 45,
+    height: 45,
+    borderRadius: 15,
+    backgroundColor: "#E4F1FF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+
+  previewTitle: {
+    color: "#0F2557",
+    fontSize: 17,
+    fontWeight: "900",
+  },
+
+  previewSubtitle: {
+    color: "#64748B",
+    fontSize: 12,
+    marginTop: 2,
   },
 
   preview: {
     width: "100%",
     height: 280,
-    borderRadius: 15,
-  },
-
-  previewText: {
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "800",
-    padding: 10,
+    borderRadius: 18,
+    backgroundColor: "#F8FAFC",
   },
 
   novaFotoButton: {
-    backgroundColor: "#E5E7EB",
-    borderRadius: 15,
-    padding: 16,
+    borderRadius: 16,
+    minHeight: 54,
     alignItems: "center",
-    marginTop: 5,
+    justifyContent: "center",
+    marginTop: 10,
+    backgroundColor: "#EFF6FF",
+    flexDirection: "row",
+    gap: 8,
   },
 
   novaFotoText: {
     color: "#2563EB",
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: "800",
   },
 
   continuarButton: {
     backgroundColor: "#16A34A",
-    borderRadius: 15,
-    padding: 18,
+    borderRadius: 17,
+    minHeight: 59,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 12,
+    marginTop: 14,
     flexDirection: "row",
-    gap: 10,
+    gap: 9,
   },
 
   continuarText: {
-    color: "#FFF",
-    fontSize: 18,
+    color: "#FFFFFF",
+    fontSize: 16,
     fontWeight: "900",
   },
 
+  // RESULTADO OCR
+
   resultadoContainer: {
-    backgroundColor: "#FFF",
-    borderRadius: 20,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 26,
     padding: 18,
     marginTop: 20,
+
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+
     elevation: 3,
   },
 
+  resultadoHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+
+  resultadoIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 17,
+    backgroundColor: "#E4F1FF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 11,
+  },
+
   resultadoTitulo: {
-    fontSize: 23,
+    fontSize: 20,
     fontWeight: "900",
-    color: "#222",
-    marginBottom: 10,
+    color: "#0F2557",
+  },
+
+  resultadoSubtitulo: {
+    fontSize: 13,
+    color: "#64748B",
+    marginTop: 2,
   },
 
   aviso: {
     backgroundColor: "#FEF3C7",
-    borderRadius: 12,
-    padding: 12,
+    borderRadius: 15,
+    padding: 13,
+    marginBottom: 16,
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
+  avisoText: {
+    flex: 1,
     color: "#92400E",
-    fontSize: 15,
-    lineHeight: 21,
-    marginBottom: 15,
+    fontSize: 13,
+    lineHeight: 19,
+    marginLeft: 8,
+    fontWeight: "600",
   },
 
   inputLabel: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "800",
-    color: "#333",
+    color: "#334155",
     marginBottom: 7,
-    marginTop: 10,
+    marginTop: 11,
+  },
+
+  inputContainer: {
+    minHeight: 56,
+    backgroundColor: "#F8FAFC",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
   },
 
   input: {
-    backgroundColor: "#F7F8FA",
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 12,
-    paddingHorizontal: 14,
+    flex: 1,
+    fontSize: 16,
+    color: "#0F172A",
+    paddingHorizontal: 10,
     paddingVertical: 14,
-    fontSize: 17,
-    color: "#222",
-    marginBottom: 5,
   },
 
   confirmarButton: {
     backgroundColor: "#16A34A",
-    borderRadius: 15,
-    padding: 18,
+    borderRadius: 18,
+    minHeight: 60,
     alignItems: "center",
-    marginTop: 20,
+    justifyContent: "center",
+    marginTop: 23,
+    flexDirection: "row",
+    gap: 8,
   },
 
   confirmarText: {
-    color: "#FFF",
-    fontSize: 17,
+    color: "#FFFFFF",
+    fontSize: 15,
     fontWeight: "900",
     textAlign: "center",
   },
 
+  // TEXTO OCR
+
   ocrContainer: {
     backgroundColor: "#EFF6FF",
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 18,
     marginTop: 20,
     borderWidth: 1,
     borderColor: "#BFDBFE",
   },
 
+  ocrHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 8,
+  },
+
   ocrTitulo: {
-    fontSize: 21,
+    fontSize: 19,
     fontWeight: "900",
     color: "#1E3A8A",
-    marginBottom: 10,
   },
 
   ocrAviso: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: "#374151",
+    fontSize: 14,
+    lineHeight: 21,
+    color: "#475569",
     marginBottom: 12,
   },
 
   ocrTextoBox: {
-    backgroundColor: "#FFF",
-    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 15,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#D1D5DB",
+    borderColor: "#DCE7F5",
   },
 
   ocrTexto: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: "#111827",
+    fontSize: 15,
+    lineHeight: 23,
+    color: "#1E293B",
   },
 
+  // MEUS MEDICAMENTOS
+
   listaButton: {
-    backgroundColor: "#E5E7EB",
-    borderRadius: 15,
-    padding: 17,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    minHeight: 78,
+    paddingHorizontal: 14,
+    marginTop: 18,
+    flexDirection: "row",
     alignItems: "center",
-    marginTop: 12,
+
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+
+    elevation: 2,
+  },
+
+  listaIcon: {
+    width: 49,
+    height: 49,
+    borderRadius: 16,
+    backgroundColor: "#E4F1FF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
   },
 
   listaButtonText: {
-    color: "#2563EB",
+    color: "#0F2557",
     fontSize: 16,
     fontWeight: "900",
+  },
+
+  listaDescription: {
+    color: "#64748B",
+    fontSize: 12,
+    marginTop: 3,
+  },
+
+  // RODAPÉ
+
+  footer: {
+    marginTop: 25,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+
+  footerText: {
+    color: "#94A3B8",
+    fontSize: 12,
+    fontWeight: "600",
   },
 });

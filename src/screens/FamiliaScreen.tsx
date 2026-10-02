@@ -1,7 +1,4 @@
-import {
-  useCallback,
-  useState,
-} from "react";
+import { useCallback, useState } from "react";
 
 import {
   ActivityIndicator,
@@ -16,9 +13,12 @@ import {
   View,
 } from "react-native";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import {
-  SafeAreaView,
-} from "react-native-safe-area-context";
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 
 import {
   useFocusEffect,
@@ -34,8 +34,7 @@ export default function FamiliaScreen() {
   const router = useRouter();
 
   const [nome, setNome] = useState("");
-  const [telefone, setTelefone] =
-    useState("");
+  const [telefone, setTelefone] = useState("");
 
   const [carregando, setCarregando] =
     useState(true);
@@ -43,19 +42,13 @@ export default function FamiliaScreen() {
   const [salvando, setSalvando] =
     useState(false);
 
-  // ==============================================
-  // CARREGAR DADOS DO DJANGO
-  // ==============================================
-
   async function carregarCuidador() {
     try {
       const cuidador =
         await buscarMeuCuidador();
 
       setNome(cuidador.nome || "");
-      setTelefone(
-        cuidador.telefone || ""
-      );
+      setTelefone(cuidador.telefone || "");
     } catch (erro) {
       console.error(
         "Erro ao carregar familiar:",
@@ -76,10 +69,6 @@ export default function FamiliaScreen() {
       carregarCuidador();
     }, [])
   );
-
-  // ==============================================
-  // SALVAR
-  // ==============================================
 
   async function salvar() {
     if (!nome.trim()) {
@@ -110,13 +99,14 @@ export default function FamiliaScreen() {
         );
 
       setNome(atualizado.nome);
+
       setTelefone(
         atualizado.telefone || ""
       );
 
       Alert.alert(
-        "Salvo",
-        "Dados do familiar salvos com sucesso."
+        "Salvo com sucesso! 💚",
+        "Os dados do familiar foram atualizados."
       );
     } catch (erro) {
       console.error(
@@ -133,44 +123,39 @@ export default function FamiliaScreen() {
     }
   }
 
-  // ==============================================
-  // CARREGANDO
-  // ==============================================
-
   if (carregando) {
     return (
-      <SafeAreaView
-        style={styles.container}
-      >
+      <SafeAreaView style={styles.container}>
         <View
-          style={
-            styles.carregandoContainer
-          }
+          style={styles.carregandoContainer}
         >
+          <View style={styles.loadingIcon}>
+            <MaterialCommunityIcons
+              name="account-group"
+              size={42}
+              color="#16A34A"
+            />
+          </View>
+
           <ActivityIndicator
             size="large"
-            color="#256D5B"
+            color="#16A34A"
           />
 
           <Text
-            style={
-              styles.carregandoTexto
-            }
+            style={styles.carregandoTexto}
           >
-            Carregando familiar...
+            Carregando área da família...
           </Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  // ==============================================
-  // TELA
-  // ==============================================
-
   return (
     <SafeAreaView
       style={styles.container}
+      edges={["top"]}
     >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -185,67 +170,151 @@ export default function FamiliaScreen() {
             styles.content
           }
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <TouchableOpacity
-            onPress={() =>
-              router.back()
-            }
-          >
-            <Text
-              style={styles.voltar}
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+              activeOpacity={0.8}
             >
-              ← Voltar
-            </Text>
-          </TouchableOpacity>
+              <Ionicons
+                name="chevron-back"
+                size={26}
+                color="#2563EB"
+              />
+            </TouchableOpacity>
 
-          <Text style={styles.title}>
-            Área da família 👨‍👩‍👧
-          </Text>
+            <View style={styles.topIcon}>
+              <MaterialCommunityIcons
+                name="account-group"
+                size={27}
+                color="#16A34A"
+              />
+            </View>
+          </View>
 
-          <Text
-            style={styles.subtitle}
-          >
-            Cadastre os dados do
-            familiar responsável.
-          </Text>
-
-          {/* FORMULÁRIO */}
-
-          <View style={styles.card}>
-            <Text
-              style={styles.cardTitle}
-            >
-              👤 Familiar responsável
+          <View style={styles.header}>
+            <Text style={styles.title}>
+              Área da família
             </Text>
 
-            <Text
-              style={styles.label}
-            >
+            <Text style={styles.subtitle}>
+              Acompanhe a rotina e mantenha
+              os dados do familiar responsável
+              atualizados.
+            </Text>
+          </View>
+
+          <View style={styles.heroCard}>
+            <View style={styles.heroIcon}>
+              <MaterialCommunityIcons
+                name="account-heart"
+                size={44}
+                color="#16A34A"
+              />
+            </View>
+
+            <View style={styles.heroContent}>
+              <Text style={styles.heroLabel}>
+                FAMÍLIA
+              </Text>
+
+              <Text style={styles.heroTitle}>
+                Cuidando de quem você ama
+              </Text>
+
+              <Text
+                style={styles.heroDescription}
+              >
+                Acompanhe medicamentos,
+                confirmações e alertas.
+              </Text>
+            </View>
+          </View>
+
+          <Text style={styles.sectionTitle}>
+            Familiar responsável
+          </Text>
+
+          <View style={styles.formCard}>
+            <View style={styles.cardHeader}>
+              <View style={styles.cardHeaderIcon}>
+                <Ionicons
+                  name="person-outline"
+                  size={24}
+                  color="#2563EB"
+                />
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <Text style={styles.cardTitle}>
+                  Dados do familiar
+                </Text>
+
+                <Text
+                  style={styles.cardSubtitle}
+                >
+                  Informe quem receberá os
+                  alertas
+                </Text>
+              </View>
+            </View>
+
+            <Text style={styles.label}>
               Nome
             </Text>
 
-            <TextInput
-              style={styles.input}
-              value={nome}
-              onChangeText={setNome}
-              placeholder="Nome do familiar"
-              placeholderTextColor="#9CA3AF"
-            />
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="person-outline"
+                size={21}
+                color="#64748B"
+              />
 
-            <Text
-              style={styles.label}
-            >
+              <TextInput
+                style={styles.input}
+                value={nome}
+                onChangeText={setNome}
+                placeholder="Nome do familiar"
+                placeholderTextColor="#94A3B8"
+              />
+            </View>
+
+            <Text style={styles.label}>
               Telefone / WhatsApp
             </Text>
 
-            <TextInput
-              style={styles.input}
-              value={telefone}
-              onChangeText={setTelefone}
-              placeholder="Ex.: 81999999999"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="phone-pad"
-            />
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="logo-whatsapp"
+                size={22}
+                color="#16A34A"
+              />
+
+              <TextInput
+                style={styles.input}
+                value={telefone}
+                onChangeText={setTelefone}
+                placeholder="Ex.: 81999999999"
+                placeholderTextColor="#94A3B8"
+                keyboardType="phone-pad"
+              />
+            </View>
+
+            <View style={styles.infoBox}>
+              <Ionicons
+                name="information-circle-outline"
+                size={21}
+                color="#2563EB"
+              />
+
+              <Text style={styles.infoText}>
+                Este telefone poderá ser
+                utilizado para receber os
+                alertas do LembraFácil.
+              </Text>
+            </View>
 
             <TouchableOpacity
               style={[
@@ -255,88 +324,208 @@ export default function FamiliaScreen() {
               ]}
               disabled={salvando}
               onPress={salvar}
+              activeOpacity={0.85}
             >
               {salvando ? (
                 <ActivityIndicator
                   color="#FFFFFF"
                 />
               ) : (
-                <Text
-                  style={
-                    styles.botaoSalvarTexto
-                  }
-                >
-                  Salvar familiar
-                </Text>
+                <>
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={24}
+                    color="#FFFFFF"
+                  />
+
+                  <Text
+                    style={
+                      styles.botaoSalvarTexto
+                    }
+                  >
+                    SALVAR FAMILIAR
+                  </Text>
+                </>
               )}
             </TouchableOpacity>
           </View>
 
-          {/* STATUS */}
+          <Text style={styles.sectionTitle}>
+            Acompanhamento
+          </Text>
 
-          <View style={styles.status}>
-            <Text
-              style={styles.statusIcon}
+          <TouchableOpacity
+            style={[
+              styles.optionCard,
+              styles.rotinaCard,
+            ]}
+            activeOpacity={0.85}
+            onPress={() =>
+              router.push("/rotina")
+            }
+          >
+            <View
+              style={[
+                styles.optionIcon,
+                styles.rotinaIcon,
+              ]}
             >
-              🟢
-            </Text>
+              <Ionicons
+                name="calendar-outline"
+                size={29}
+                color="#2563EB"
+              />
+            </View>
 
-            <View style={{ flex: 1 }}>
-              <Text
-                style={
-                  styles.statusTitle
-                }
-              >
+            <View style={styles.optionContent}>
+              <View style={styles.statusRow}>
+                <View style={styles.statusDot} />
+
+                <Text style={styles.statusLabel}>
+                  ACOMPANHAMENTO ATIVO
+                </Text>
+              </View>
+
+              <Text style={styles.optionTitle}>
                 Rotina de hoje
               </Text>
 
               <Text
-                style={
-                  styles.statusText
-                }
+                style={styles.optionDescription}
               >
-                Os medicamentos e
-                confirmações serão
-                acompanhados pelo
-                LembraFácil.
+                Veja horários e confirmações
+                dos medicamentos.
+              </Text>
+            </View>
+
+            <View style={styles.blueArrow}>
+              <Ionicons
+                name="chevron-forward"
+                size={22}
+                color="#2563EB"
+              />
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.optionCard,
+              styles.medicamentoCard,
+            ]}
+            activeOpacity={0.85}
+            onPress={() =>
+              router.push("/medicamentos")
+            }
+          >
+            <View
+              style={[
+                styles.optionIcon,
+                styles.medicamentoIcon,
+              ]}
+            >
+              <MaterialCommunityIcons
+                name="pill"
+                size={31}
+                color="#E53935"
+              />
+            </View>
+
+            <View style={styles.optionContent}>
+              <Text style={styles.optionTitle}>
+                Medicamentos
+              </Text>
+
+              <Text
+                style={styles.optionDescription}
+              >
+                Consulte os medicamentos
+                cadastrados no LembraFácil.
+              </Text>
+            </View>
+
+            <View style={styles.redArrow}>
+              <Ionicons
+                name="chevron-forward"
+                size={22}
+                color="#E53935"
+              />
+            </View>
+          </TouchableOpacity>
+
+          <View
+            style={[
+              styles.optionCard,
+              styles.alertaCard,
+            ]}
+          >
+            <View
+              style={[
+                styles.optionIcon,
+                styles.alertaIcon,
+              ]}
+            >
+              <Ionicons
+                name="notifications-outline"
+                size={29}
+                color="#F59E0B"
+              />
+            </View>
+
+            <View style={styles.optionContent}>
+              <Text style={styles.optionTitle}>
+                Alertas
+              </Text>
+
+              <Text
+                style={styles.optionDescription}
+              >
+                O familiar poderá ser avisado
+                quando houver um medicamento
+                atrasado.
               </Text>
             </View>
           </View>
 
-          {/* MEDICAMENTOS */}
+          <View style={styles.footerCard}>
+            <View style={styles.footerItem}>
+              <Ionicons
+                name="shield-checkmark"
+                size={21}
+                color="#16A34A"
+              />
 
-          <View style={styles.card}>
-            <Text
-              style={styles.cardTitle}
-            >
-              💊 Medicamentos
-            </Text>
+              <Text style={styles.footerText}>
+                Cuidado{"\n"}e segurança
+              </Text>
+            </View>
 
-            <Text
-              style={styles.cardText}
-            >
-              Os medicamentos cadastrados
-              podem ser acompanhados pela
-              área de mensagens.
-            </Text>
-          </View>
+            <View style={styles.footerDivider} />
 
-          {/* ALERTAS */}
+            <View style={styles.footerItem}>
+              <Ionicons
+                name="notifications"
+                size={21}
+                color="#16A34A"
+              />
 
-          <View style={styles.card}>
-            <Text
-              style={styles.cardTitle}
-            >
-              🚨 Alertas
-            </Text>
+              <Text style={styles.footerText}>
+                Alertas{"\n"}importantes
+              </Text>
+            </View>
 
-            <Text
-              style={styles.cardText}
-            >
-              O telefone cadastrado será
-              utilizado na próxima etapa
-              para avisar o familiar.
-            </Text>
+            <View style={styles.footerDivider} />
+
+            <View style={styles.footerItem}>
+              <Ionicons
+                name="heart"
+                size={21}
+                color="#16A34A"
+              />
+
+              <Text style={styles.footerText}>
+                Sempre{"\n"}por perto
+              </Text>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -344,135 +533,428 @@ export default function FamiliaScreen() {
   );
 }
 
-const styles =
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#F7F8FA",
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F8FBFF",
+  },
+
+  carregandoContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 30,
+  },
+
+  loadingIcon: {
+    width: 82,
+    height: 82,
+    borderRadius: 27,
+    backgroundColor: "#E8F9EE",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+
+  carregandoTexto: {
+    marginTop: 15,
+    color: "#64748B",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  content: {
+    paddingHorizontal: 18,
+    paddingTop: 12,
+    paddingBottom: 35,
+  },
+
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+
+  backButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 3,
     },
 
-    carregandoContainer: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
+    elevation: 3,
+  },
+
+  topIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: "#E8F9EE",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  header: {
+    marginBottom: 20,
+  },
+
+  title: {
+    color: "#0F2557",
+    fontSize: 31,
+    fontWeight: "900",
+    letterSpacing: -0.5,
+  },
+
+  subtitle: {
+    color: "#64748B",
+    fontSize: 15,
+    lineHeight: 22,
+    fontWeight: "500",
+    marginTop: 6,
+  },
+
+  heroCard: {
+    minHeight: 130,
+    backgroundColor: "#E8F9EE",
+    borderRadius: 25,
+    padding: 17,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 24,
+
+    borderWidth: 1,
+    borderColor: "#D7F2E1",
+
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: 4,
     },
 
-    carregandoTexto: {
-      marginTop: 12,
-      color: "#666",
-      fontSize: 16,
+    elevation: 3,
+  },
+
+  heroIcon: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    backgroundColor: "#D3F3DF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 14,
+  },
+
+  heroContent: {
+    flex: 1,
+  },
+
+  heroLabel: {
+    color: "#16A34A",
+    fontSize: 13,
+    fontWeight: "900",
+    marginBottom: 3,
+  },
+
+  heroTitle: {
+    color: "#0F2557",
+    fontSize: 20,
+    lineHeight: 24,
+    fontWeight: "900",
+  },
+
+  heroDescription: {
+    color: "#64748B",
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 4,
+  },
+
+  sectionTitle: {
+    color: "#0F2557",
+    fontSize: 22,
+    fontWeight: "900",
+    marginBottom: 12,
+  },
+
+  formCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 17,
+    marginBottom: 25,
+
+    borderWidth: 1,
+    borderColor: "#E8EEF5",
+
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.06,
+    shadowRadius: 11,
+    shadowOffset: {
+      width: 0,
+      height: 4,
     },
 
-    content: {
-      padding: 22,
-      paddingBottom: 50,
+    elevation: 3,
+  },
+
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 18,
+  },
+
+  cardHeaderIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: "#E4F1FF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 11,
+  },
+
+  cardTitle: {
+    color: "#0F2557",
+    fontSize: 18,
+    fontWeight: "900",
+  },
+
+  cardSubtitle: {
+    color: "#64748B",
+    fontSize: 12,
+    marginTop: 2,
+  },
+
+  label: {
+    color: "#334155",
+    fontSize: 14,
+    fontWeight: "800",
+    marginBottom: 7,
+    marginTop: 6,
+  },
+
+  inputContainer: {
+    minHeight: 57,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    backgroundColor: "#F8FAFC",
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: "#0F172A",
+    paddingHorizontal: 10,
+    paddingVertical: 14,
+  },
+
+  infoBox: {
+    backgroundColor: "#EFF6FF",
+    borderRadius: 14,
+    padding: 12,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginTop: 4,
+  },
+
+  infoText: {
+    flex: 1,
+    color: "#475569",
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: "600",
+    marginLeft: 8,
+  },
+
+  botaoSalvar: {
+    minHeight: 59,
+    backgroundColor: "#16A34A",
+    borderRadius: 18,
+    marginTop: 17,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 9,
+
+    shadowColor: "#16A34A",
+    shadowOpacity: 0.17,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 4,
     },
 
-    voltar: {
-      fontSize: 18,
-      color: "#256D5B",
-      fontWeight: "700",
-      marginBottom: 25,
+    elevation: 4,
+  },
+
+  botaoDesabilitado: {
+    opacity: 0.6,
+  },
+
+  botaoSalvarTexto: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "900",
+  },
+
+  optionCard: {
+    minHeight: 118,
+    borderRadius: 22,
+    padding: 15,
+    marginBottom: 13,
+    flexDirection: "row",
+    alignItems: "center",
+
+    borderWidth: 1,
+
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 3,
     },
 
-    title: {
-      fontSize: 30,
-      fontWeight: "800",
-      color: "#222",
-    },
+    elevation: 2,
+  },
 
-    subtitle: {
-      fontSize: 17,
-      color: "#666",
-      marginTop: 8,
-      marginBottom: 28,
-      lineHeight: 24,
-    },
+  rotinaCard: {
+    backgroundColor: "#F0F7FF",
+    borderColor: "#DCEBFF",
+  },
 
-    status: {
-      backgroundColor: "#FFF",
-      borderRadius: 18,
-      padding: 20,
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 18,
-      elevation: 3,
-    },
+  medicamentoCard: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#F1E5E5",
+  },
 
-    statusIcon: {
-      fontSize: 35,
-      marginRight: 15,
-    },
+  alertaCard: {
+    backgroundColor: "#FFFBEB",
+    borderColor: "#FDE7B0",
+  },
 
-    statusTitle: {
-      fontSize: 20,
-      fontWeight: "800",
-      color: "#222",
-    },
+  optionIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 13,
+  },
 
-    statusText: {
-      color: "#666",
-      marginTop: 4,
-      lineHeight: 21,
-    },
+  rotinaIcon: {
+    backgroundColor: "#DDEEFF",
+  },
 
-    card: {
-      backgroundColor: "#FFF",
-      borderRadius: 18,
-      padding: 20,
-      marginBottom: 16,
-      elevation: 3,
-    },
+  medicamentoIcon: {
+    backgroundColor: "#FFEAEA",
+  },
 
-    cardTitle: {
-      fontSize: 21,
-      fontWeight: "800",
-      color: "#222",
-      marginBottom: 15,
-    },
+  alertaIcon: {
+    backgroundColor: "#FEF3C7",
+  },
 
-    cardText: {
-      fontSize: 16,
-      color: "#666",
-      lineHeight: 23,
-    },
+  optionContent: {
+    flex: 1,
+  },
 
-    label: {
-      fontSize: 15,
-      fontWeight: "700",
-      color: "#374151",
-      marginBottom: 7,
-    },
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 3,
+  },
 
-    input: {
-      borderWidth: 1,
-      borderColor: "#D1D5DB",
-      backgroundColor: "#F9FAFB",
-      borderRadius: 12,
-      paddingHorizontal: 15,
-      paddingVertical: 13,
-      fontSize: 16,
-      color: "#111827",
-      marginBottom: 17,
-    },
+  statusDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: "#16A34A",
+    marginRight: 5,
+  },
 
-    botaoSalvar: {
-      backgroundColor: "#256D5B",
-      borderRadius: 12,
-      paddingVertical: 15,
-      alignItems: "center",
-      justifyContent: "center",
-      minHeight: 50,
-      marginTop: 3,
-    },
+  statusLabel: {
+    color: "#16A34A",
+    fontSize: 10,
+    fontWeight: "900",
+  },
 
-    botaoDesabilitado: {
-      opacity: 0.6,
-    },
+  optionTitle: {
+    color: "#0F2557",
+    fontSize: 18,
+    fontWeight: "900",
+  },
 
-    botaoSalvarTexto: {
-      color: "#FFFFFF",
-      fontSize: 16,
-      fontWeight: "800",
-    },
-  });
+  optionDescription: {
+    color: "#64748B",
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 4,
+    paddingRight: 4,
+  },
+
+  blueArrow: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#E0EFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 7,
+  },
+
+  redArrow: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#FFEAEA",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 7,
+  },
+
+  footerCard: {
+    marginTop: 10,
+    borderRadius: 22,
+    paddingVertical: 17,
+    paddingHorizontal: 10,
+    backgroundColor: "#EAF9F0",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  footerItem: {
+    flex: 1,
+    alignItems: "center",
+  },
+
+  footerText: {
+    color: "#166534",
+    fontSize: 11,
+    lineHeight: 14,
+    textAlign: "center",
+    fontWeight: "700",
+    marginTop: 5,
+  },
+
+  footerDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: "#B7E4C7",
+  },
+});

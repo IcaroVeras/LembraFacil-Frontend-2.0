@@ -9,6 +9,11 @@ import {
   View,
 } from "react-native";
 
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
+
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -19,10 +24,6 @@ export default function Inicio() {
 
   const [verificandoLogin, setVerificandoLogin] =
     useState(true);
-
-  // =========================================================
-  // VERIFICAR LOGIN AO ABRIR O APP
-  // =========================================================
 
   useEffect(() => {
     verificarLogin();
@@ -50,10 +51,6 @@ export default function Inicio() {
     }
   }
 
-  // =========================================================
-  // CARREGANDO
-  // =========================================================
-
   if (verificandoLogin) {
     return (
       <SafeAreaView style={styles.container}>
@@ -71,194 +68,307 @@ export default function Inicio() {
     );
   }
 
-  // =========================================================
-  // TELA INICIAL
-  // =========================================================
-
   return (
-    <SafeAreaView style={styles.container}>
-
-      {/* CABEÇALHO */}
-
-      <View style={styles.header}>
-        <Text style={styles.logo}>
-          LembraFácil
-        </Text>
-
-        <Text style={styles.subtitle}>
-          Cuidando da sua rotina com carinho
-        </Text>
-      </View>
-
-      {/* CONTEÚDO COM ROLAGEM */}
-
+    <SafeAreaView
+      style={styles.container}
+      edges={["top"]}
+    >
       <ScrollView
-        style={styles.content}
-        contentContainerStyle={
-          styles.contentContainer
-        }
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
       >
+        <View style={styles.header}>
+          <View style={styles.brandRow}>
+            <View style={styles.logoIcon}>
+              <MaterialCommunityIcons
+                name="heart-pulse"
+                size={34}
+                color="#2563EB"
+              />
+            </View>
 
-        <Text style={styles.title}>
-          Como podemos ajudar?
-        </Text>
+            <View style={styles.brandText}>
+              <Text style={styles.logo}>
+                <Text style={styles.logoBlue}>
+                  Lembra
+                </Text>
 
-        {/* ================================================= */}
-        {/* IDOSO */}
-        {/* ================================================= */}
+                <Text style={styles.logoGreen}>
+                  Fácil
+                </Text>
+              </Text>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() =>
-            router.push("/idoso")
-          }
-        >
-          <Text style={styles.emoji}>
-            👴
+              <Text style={styles.subtitle}>
+                Cuidando da sua rotina com carinho
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.settingsButton}
+              activeOpacity={0.8}
+            >
+              <Ionicons
+                name="settings-outline"
+                size={25}
+                color="#64748B"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.welcome}>
+          <Text style={styles.hello}>
+            Olá! 👋
           </Text>
 
-          <View style={styles.buttonContent}>
-            <Text style={styles.buttonTitle}>
+          <Text style={styles.title}>
+            Como podemos ajudar hoje?
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={[
+            styles.profileCard,
+            styles.idosoCard,
+          ]}
+          activeOpacity={0.85}
+          onPress={() => router.push("/idoso")}
+        >
+          <View
+            style={[
+              styles.profileIcon,
+              styles.idosoIcon,
+            ]}
+          >
+            <Text style={styles.profileEmoji}>
+              👴
+            </Text>
+          </View>
+
+          <View style={styles.profileContent}>
+            <Text style={styles.idosoLabel}>
               SOU IDOSO
             </Text>
 
-            <Text style={styles.buttonText}>
-              Quero acompanhar minha rotina
+            <Text style={styles.profileTitle}>
+              Minha rotina e horários
             </Text>
+
+            <Text style={styles.profileDescription}>
+              Ver meus medicamentos, lembretes e
+              confirmações
+            </Text>
+          </View>
+
+          <View
+            style={[
+              styles.arrowButton,
+              styles.blueArrow,
+            ]}
+          >
+            <Ionicons
+              name="chevron-forward"
+              size={25}
+              color="#FFFFFF"
+            />
           </View>
         </TouchableOpacity>
 
-        {/* ================================================= */}
-        {/* FAMILIAR */}
-        {/* ================================================= */}
-
         <TouchableOpacity
-          style={styles.button}
-          onPress={() =>
-            router.push("/familia")
-          }
+          style={[
+            styles.profileCard,
+            styles.familiaCard,
+          ]}
+          activeOpacity={0.85}
+          onPress={() => router.push("/familia")}
         >
-          <Text style={styles.emoji}>
-            👨‍👩‍👧
-          </Text>
+          <View
+            style={[
+              styles.profileIcon,
+              styles.familiaIcon,
+            ]}
+          >
+            <MaterialCommunityIcons
+              name="account-group"
+              size={48}
+              color="#16A34A"
+            />
+          </View>
 
-          <View style={styles.buttonContent}>
-            <Text style={styles.buttonTitle}>
+          <View style={styles.profileContent}>
+            <Text style={styles.familiaLabel}>
               SOU FAMILIAR
             </Text>
 
-            <Text style={styles.buttonText}>
-              Quero acompanhar meu familiar
+            <Text style={styles.profileTitle}>
+              Acompanhar meu familiar
+            </Text>
+
+            <Text style={styles.profileDescription}>
+              Ver rotina e confirmações
             </Text>
           </View>
-        </TouchableOpacity>
 
-        {/* ================================================= */}
-        {/* RECEITA */}
-        {/* ================================================= */}
-
-        <TouchableOpacity
-          style={styles.recipeButton}
-          onPress={() =>
-            router.push("/receita")
-          }
-        >
-          <Text style={styles.recipeEmoji}>
-            📷
-          </Text>
-
-          <Text style={styles.recipeTitle}>
-            LER RECEITA
-          </Text>
-
-          <Text style={styles.recipeText}>
-            Tire uma foto da receita para
-            cadastrar os medicamentos
-          </Text>
-        </TouchableOpacity>
-
-        {/* ================================================= */}
-        {/* MEDICAMENTOS */}
-        {/* ================================================= */}
-
-        <TouchableOpacity
-          style={styles.medicamentosButton}
-          onPress={() =>
-            router.push("/medicamentos")
-          }
-        >
-          <Text
-            style={styles.medicamentosEmoji}
+          <View
+            style={[
+              styles.arrowButton,
+              styles.greenArrow,
+            ]}
           >
-            💊
-          </Text>
-
-          <View style={styles.buttonContent}>
-            <Text
-              style={styles.medicamentosTitle}
-            >
-              MEUS MEDICAMENTOS
-            </Text>
-
-            <Text
-              style={styles.medicamentosText}
-            >
-              Visualizar medicamentos cadastrados
-            </Text>
+            <Ionicons
+              name="chevron-forward"
+              size={25}
+              color="#FFFFFF"
+            />
           </View>
         </TouchableOpacity>
 
-        {/* ================================================= */}
-        {/* MENSAGENS */}
-        {/* ================================================= */}
-
-        <TouchableOpacity
-          style={styles.mensagensButton}
-          onPress={() =>
-            router.push("/mensagens")
-          }
-        >
-          <Text style={styles.mensagensEmoji}>
-            💬
-          </Text>
-
-          <View style={styles.buttonContent}>
-            <Text style={styles.mensagensTitle}>
-              MENSAGENS
-            </Text>
-
-            <Text style={styles.mensagensText}>
-              Acompanhar horários e confirmações
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* RODAPÉ */}
-
-        <Text style={styles.footer}>
-          Simples • Seguro • Fácil de usar
+        <Text style={styles.sectionTitle}>
+          Acesso rápido
         </Text>
 
+        <View style={styles.quickGrid}>
+          <TouchableOpacity
+            style={styles.quickCard}
+            activeOpacity={0.85}
+            onPress={() =>
+              router.push("/receita")
+            }
+          >
+            <View
+              style={[
+                styles.quickIcon,
+                styles.cameraBg,
+              ]}
+            >
+              <Ionicons
+                name="camera"
+                size={31}
+                color="#2563EB"
+              />
+            </View>
+
+            <Text style={styles.quickTitle}>
+              Ler Receita
+            </Text>
+
+            <Text style={styles.quickDescription}>
+              Tire uma foto para cadastrar
+            </Text>
+
+            <View
+              style={[
+                styles.smallArrow,
+                styles.smallBlue,
+              ]}
+            >
+              <Ionicons
+                name="chevron-forward"
+                size={18}
+                color="#2563EB"
+              />
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.quickCard}
+            activeOpacity={0.85}
+            onPress={() =>
+              router.push("/medicamentos")
+            }
+          >
+            <View
+              style={[
+                styles.quickIcon,
+                styles.medicineBg,
+              ]}
+            >
+              <MaterialCommunityIcons
+                name="pill"
+                size={32}
+                color="#E53935"
+              />
+            </View>
+
+            <Text style={styles.quickTitle}>
+              Meus Medicamentos
+            </Text>
+
+            <Text style={styles.quickDescription}>
+              Visualizar cadastrados
+            </Text>
+
+            <View
+              style={[
+                styles.smallArrow,
+                styles.smallRed,
+              ]}
+            >
+              <Ionicons
+                name="chevron-forward"
+                size={18}
+                color="#E53935"
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.footerCard}>
+          <View style={styles.footerItem}>
+            <Ionicons
+              name="checkmark-circle"
+              size={21}
+              color="#16A34A"
+            />
+
+            <Text style={styles.footerText}>
+              Simples{"\n"}de usar
+            </Text>
+          </View>
+
+          <View style={styles.footerDivider} />
+
+          <View style={styles.footerItem}>
+            <Ionicons
+              name="shield-checkmark"
+              size={21}
+              color="#16A34A"
+            />
+
+            <Text style={styles.footerText}>
+              Seguro{"\n"}para sua família
+            </Text>
+          </View>
+
+          <View style={styles.footerDivider} />
+
+          <View style={styles.footerItem}>
+            <Ionicons
+              name="heart"
+              size={21}
+              color="#16A34A"
+            />
+
+            <Text style={styles.footerText}>
+              Feito com{"\n"}carinho
+            </Text>
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-// ===========================================================
-// ESTILOS
-// ===========================================================
-
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
-    backgroundColor: "#F7F8FA",
+    backgroundColor: "#F8FBFF",
   },
 
-  // =========================================================
-  // LOADING
-  // =========================================================
+  scrollContent: {
+    paddingHorizontal: 18,
+    paddingBottom: 28,
+  },
 
   loadingContainer: {
     flex: 1,
@@ -268,73 +378,66 @@ const styles = StyleSheet.create({
 
   loadingText: {
     marginTop: 15,
-    fontSize: 17,
-    color: "#555",
+    fontSize: 16,
+    color: "#64748B",
     fontWeight: "600",
   },
 
-  // =========================================================
-  // HEADER
-  // =========================================================
-
   header: {
+    paddingTop: 10,
+    paddingBottom: 18,
+  },
+
+  brandRow: {
+    flexDirection: "row",
     alignItems: "center",
-    paddingTop: 25,
-    paddingHorizontal: 25,
-    paddingBottom: 5,
+  },
+
+  logoIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: "#EAF3FF",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+
+  brandText: {
+    flex: 1,
   },
 
   logo: {
-    fontSize: 38,
-    fontWeight: "800",
+    fontSize: 30,
+    fontWeight: "900",
+    letterSpacing: -1,
+  },
+
+  logoBlue: {
     color: "#2563EB",
   },
 
+  logoGreen: {
+    color: "#16A34A",
+  },
+
   subtitle: {
-    fontSize: 18,
-    color: "#555",
-    textAlign: "center",
-    marginTop: 8,
+    color: "#64748B",
+    fontSize: 13,
+    marginTop: 1,
+    fontWeight: "500",
   },
 
-  // =========================================================
-  // CONTEÚDO
-  // =========================================================
-
-  content: {
-    flex: 1,
-    paddingHorizontal: 22,
-  },
-
-  contentContainer: {
-    paddingTop: 30,
-    paddingBottom: 35,
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#222",
-    marginBottom: 25,
-    textAlign: "center",
-  },
-
-  // =========================================================
-  // BOTÕES PRINCIPAIS
-  // =========================================================
-
-  button: {
-    minHeight: 95,
+  settingsButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    marginBottom: 16,
-    padding: 18,
-
-    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
 
     shadowColor: "#000",
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.07,
     shadowRadius: 8,
 
     shadowOffset: {
@@ -345,159 +448,239 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
 
-  buttonContent: {
+  welcome: {
+    marginTop: 5,
+    marginBottom: 20,
+  },
+
+  hello: {
+    fontSize: 22,
+    color: "#0F2557",
+    fontWeight: "800",
+  },
+
+  title: {
+    fontSize: 29,
+    lineHeight: 35,
+    color: "#0F2557",
+    fontWeight: "900",
+    marginTop: 2,
+    letterSpacing: -0.5,
+  },
+
+  profileCard: {
+    minHeight: 145,
+    borderRadius: 25,
+    padding: 16,
+    marginBottom: 15,
+    flexDirection: "row",
+    alignItems: "center",
+
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.9)",
+
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+
+    elevation: 4,
+  },
+
+  idosoCard: {
+    backgroundColor: "#E4F3FF",
+  },
+
+  familiaCard: {
+    backgroundColor: "#E8F9EE",
+  },
+
+  profileIcon: {
+    width: 83,
+    height: 83,
+    borderRadius: 42,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 14,
+  },
+
+  idosoIcon: {
+    backgroundColor: "#D2EAFF",
+  },
+
+  familiaIcon: {
+    backgroundColor: "#D3F3DF",
+  },
+
+  profileEmoji: {
+    fontSize: 52,
+  },
+
+  profileContent: {
     flex: 1,
   },
 
-  emoji: {
-    fontSize: 42,
-    marginRight: 18,
-  },
-
-  buttonTitle: {
-    fontSize: 21,
-    fontWeight: "800",
-    color: "#222",
-  },
-
-  buttonText: {
-    fontSize: 15,
-    color: "#666",
-    marginTop: 4,
-  },
-
-  // =========================================================
-  // RECEITA
-  // =========================================================
-
-  recipeButton: {
-    backgroundColor: "#2563EB",
-    borderRadius: 18,
-    padding: 20,
-    alignItems: "center",
-    marginTop: 2,
-  },
-
-  recipeEmoji: {
-    fontSize: 38,
-    marginBottom: 5,
-  },
-
-  recipeTitle: {
-    color: "#FFFFFF",
-    fontSize: 22,
-    fontWeight: "800",
-  },
-
-  recipeText: {
-    color: "#E8EEFF",
-    fontSize: 15,
-    textAlign: "center",
-    marginTop: 6,
-    lineHeight: 21,
-  },
-
-  // =========================================================
-  // MEDICAMENTOS
-  // =========================================================
-
-  medicamentosButton: {
-    minHeight: 85,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    marginTop: 15,
-    padding: 17,
-
-    flexDirection: "row",
-    alignItems: "center",
-
-    borderWidth: 1,
-    borderColor: "#DBEAFE",
-
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-
-    elevation: 2,
-  },
-
-  medicamentosEmoji: {
-    fontSize: 36,
-    marginRight: 16,
-  },
-
-  medicamentosTitle: {
-    fontSize: 18,
-    fontWeight: "800",
+  idosoLabel: {
     color: "#2563EB",
-  },
-
-  medicamentosText: {
+    fontWeight: "900",
     fontSize: 14,
-    color: "#666",
-    marginTop: 3,
+    marginBottom: 4,
   },
 
-  // =========================================================
-  // MENSAGENS
-  // =========================================================
+  familiaLabel: {
+    color: "#16A34A",
+    fontWeight: "900",
+    fontSize: 14,
+    marginBottom: 4,
+  },
 
-  mensagensButton: {
-    minHeight: 85,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    marginTop: 15,
-    padding: 17,
+  profileTitle: {
+    color: "#0F2557",
+    fontSize: 21,
+    lineHeight: 25,
+    fontWeight: "900",
+  },
 
-    flexDirection: "row",
+  profileDescription: {
+    color: "#64748B",
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 5,
+    fontWeight: "500",
+  },
+
+  arrowButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    justifyContent: "center",
     alignItems: "center",
+    marginLeft: 7,
+  },
 
-    borderWidth: 1,
-    borderColor: "#DCFCE7",
+  blueArrow: {
+    backgroundColor: "#3182F6",
+  },
 
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
+  greenArrow: {
+    backgroundColor: "#20B26B",
+  },
+
+  sectionTitle: {
+    color: "#0F2557",
+    fontSize: 24,
+    fontWeight: "900",
+    marginTop: 8,
+    marginBottom: 13,
+  },
+
+  quickGrid: {
+    flexDirection: "row",
+    gap: 10,
+  },
+
+  quickCard: {
+    flex: 1,
+    minHeight: 185,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 22,
+    padding: 13,
+
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.07,
+    shadowRadius: 10,
 
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
 
-    elevation: 2,
+    elevation: 3,
   },
 
-  mensagensEmoji: {
-    fontSize: 36,
-    marginRight: 16,
+  quickIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 13,
   },
 
-  mensagensTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#16A34A",
+  cameraBg: {
+    backgroundColor: "#E4F1FF",
   },
 
-  mensagensText: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 3,
+  medicineBg: {
+    backgroundColor: "#FFE9E9",
   },
 
-  // =========================================================
-  // FOOTER
-  // =========================================================
+  quickTitle: {
+    color: "#0F2557",
+    fontSize: 16,
+    lineHeight: 19,
+    fontWeight: "900",
+  },
 
-  footer: {
+  quickDescription: {
+    color: "#64748B",
+    fontSize: 12,
+    lineHeight: 16,
+    marginTop: 6,
+    paddingRight: 3,
+  },
+
+  smallArrow: {
+    position: "absolute",
+    bottom: 12,
+    right: 12,
+    width: 31,
+    height: 31,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  smallBlue: {
+    backgroundColor: "#E5F2FF",
+  },
+
+  smallRed: {
+    backgroundColor: "#FFEAEA",
+  },
+
+  footerCard: {
+    marginTop: 22,
+    borderRadius: 22,
+    paddingVertical: 17,
+    paddingHorizontal: 12,
+    backgroundColor: "#EAF9F0",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  footerItem: {
+    flex: 1,
+    alignItems: "center",
+  },
+
+  footerText: {
+    marginTop: 5,
+    color: "#166534",
+    fontSize: 11,
+    lineHeight: 14,
     textAlign: "center",
-    color: "#777",
-    fontSize: 14,
-    marginTop: 25,
-    paddingBottom: 10,
+    fontWeight: "700",
+  },
+
+  footerDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: "#B7E4C7",
   },
 });

@@ -96,24 +96,42 @@ function converterParaAPI(
 
 // ======================================================
 // NORMALIZAR HORÁRIO
+// Aceita: 8, 8h, 8h30, 8:00, 8.30, 0800, 08:00:00
+// Devolve sempre HH:MM:00 ou lança erro se for inválido
 // ======================================================
 
 function normalizarHorario(
   horario: string
 ): string {
-  const valor = horario.trim();
+  const valor = horario
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "");
 
-  // 08:00:00
-  if (/^\d{2}:\d{2}:\d{2}$/.test(valor)) {
-    return valor;
+  const m =
+    valor.match(/^(\d{1,2})[:h.](\d{1,2})?(?:min)?(?::\d{2})?$/) || // 8:00, 8h30, 8h, 8.30, 08:00:00
+    valor.match(/^(\d{1,2})()$/) ||                                  // 8
+    valor.match(/^(\d{2})(\d{2})$/);                                 // 0800
+
+  if (!m) {
+    throw new Error(
+      "Horário inválido. Use o formato 08:00."
+    );
   }
 
-  // 08:00
-  if (/^\d{2}:\d{2}$/.test(valor)) {
-    return `${valor}:00`;
+  const horas = Number(m[1]);
+  const minutos = m[2] ? Number(m[2]) : 0;
+
+  if (horas > 23 || minutos > 59) {
+    throw new Error(
+      "Horário inválido. Use o formato 08:00."
+    );
   }
 
-  return valor;
+  const hh = String(horas).padStart(2, "0");
+  const mm = String(minutos).padStart(2, "0");
+
+  return `${hh}:${mm}:00`;
 }
 
 // ======================================================
