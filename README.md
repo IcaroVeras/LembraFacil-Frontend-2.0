@@ -1,25 +1,29 @@
-💊 LembraFácil — Frontend
+# 💊 LembraFácil — Frontend
 
-O LembraFácil é um aplicativo desenvolvido para auxiliar no controle da rotina de medicamentos, facilitando o acompanhamento dos horários e das doses.
+O LembraFácil é um aplicativo desenvolvido para auxiliar no controle da rotina de
+medicamentos, facilitando o acompanhamento dos horários e das doses.
 
-📱 Funcionalidades
+## 📱 Funcionalidades
 
-- Cadastro de medicamentos
+- Login e cadastro de usuário
+- Cadastro, edição e exclusão de medicamentos
 - Visualização dos medicamentos cadastrados
 - Leitura de receitas através de OCR
 - Extração de informações da receita
 - Edição e confirmação das informações antes de salvar
-- Login do usuário
 - Controle dos horários dos medicamentos
+- Confirmação de doses tomadas
 - Acompanhamento da rotina de medicação
-- Identificação de doses em atraso
+- Aviso ao familiar/cuidador pelo WhatsApp
 - Área destinada ao familiar/cuidador
+- Identificação de doses em atraso (em desenvolvimento)
 
-📷 Leitura de Receita com OCR
+## 📷 Leitura de Receita com OCR
 
 O aplicativo permite fotografar ou selecionar uma imagem de uma receita médica.
 
-A tecnologia OCR transforma o conteúdo da imagem em texto para auxiliar na identificação de informações como:
+A tecnologia OCR transforma o conteúdo da imagem em texto para auxiliar na
+identificação de informações como:
 
 - Nome do medicamento
 - Dosagem
@@ -30,7 +34,7 @@ A tecnologia OCR transforma o conteúdo da imagem em texto para auxiliar na iden
 
 As informações podem ser conferidas e corrigidas pelo usuário antes de serem salvas.
 
-🛠️ Tecnologias utilizadas
+## 🛠️ Tecnologias utilizadas
 
 - React Native
 - Expo
@@ -41,14 +45,43 @@ As informações podem ser conferidas e corrigidas pelo usuário antes de serem 
 - Expo Image Picker
 - API REST
 
-🔗 Backend
+## ▶️ Como rodar
 
-O aplicativo se comunica com uma API desenvolvida em Django REST Framework para realizar autenticação e gerenciamento dos medicamentos.
+Pré-requisitos: Node.js instalado e o aplicativo **Expo Go** no celular.
 
-🎯 Objetivo
+```bash
+git clone https://github.com/IcaroVeras/LembraFacil-Frontend-2.0.git
+cd LembraFacil-Frontend-2.0
 
-O objetivo do LembraFácil é tornar o controle de medicamentos mais simples e organizado, especialmente para idosos, familiares e cuidadores.
+npm install
+npx expo start
+```
 
-🚧 Status
+Leia o QR Code com o Expo Go (Android) ou com a câmera (iPhone). O celular e o
+computador precisam estar no **mesmo Wi-Fi**.
+
+## 🔗 Backend
+
+O aplicativo se comunica com uma API desenvolvida em Django REST Framework, para
+autenticação e gerenciamento dos medicamentos e registros de dose.
+
+Repositório do backend: https://github.com/IcaroVeras/LembraFacil-Backend-2.0
+
+Para o app encontrar o servidor, edite o endereço em `src/services/authService.ts`:
+
+```ts
+export const API_URL = "http://IP_DO_SEU_COMPUTADOR:8000/api";
+```
+
+Use o IP do computador onde o backend está rodando (`ipconfig` no Windows) e inicie o
+servidor com `python manage.py runserver 0.0.0.0:8000`. O IP precisa estar em
+`ALLOWED_HOSTS` no `settings.py` do backend.
+
+## 🎯 Objetivo
+
+O objetivo do LembraFácil é tornar o controle de medicamentos mais simples e
+organizado, especialmente para idosos, familiares e cuidadores.
+
+## 🚧 Status
 
 Projeto em desenvolvimento.
